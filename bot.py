@@ -1,8 +1,8 @@
 import json
 from difflib import SequenceMatcher
+from itertools import cycle
 from os import environ, getenv, mkdir
 from os.path import isfile, isdir
-from itertools import cycle
 from pathlib import Path
 from re import fullmatch
 from textwrap import TextWrapper
@@ -434,6 +434,16 @@ async def bsay(ctx, *, message):
     if str(ctx.author.id) == str(settings["author_id"]):
         await ctx.message.delete()
         await ctx.send(message)
+
+
+@client.command()
+@commands.has_permissions(manage_roles=True)
+async def export(ctx):
+    with open("data/users.json") as f:
+        try:
+            await ctx.send("Here is the user JSON file", file=f)
+        except discord.errors.InvalidArgument:
+            await ctx.send("File is too large too send, ask the hoster for the file instead.")
 
 
 client.run(BOT_TOKEN)
