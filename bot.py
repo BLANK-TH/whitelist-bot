@@ -46,7 +46,7 @@ with open("data/settings.json") as f:
         if len(i) < 1:
             print("Please fill out the settings")
             exit()
-status = cycle(["Developed by blank_dvth"] + settings["status_loop"])
+status = cycle(["Developed by BLANK"] + settings["status_loop"])
 
 
 def get_username(uuid):
