@@ -83,7 +83,8 @@ async def on_member_remove(member):
             # Post to staff channel
             channel = client.get_channel(int(settings["request_channel"]))
             e = discord.Embed(title=get_username(usr["uuid"]),
-                              description="Unwhitelist request")
+                              description="Unwhitelist request",
+                              colour=hc)
             e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(usr["uuid"]))
             e.add_field(name="Discord User", value=member.mention)
             e.add_field(name="Type", value="Unwhitelist")
@@ -177,7 +178,8 @@ async def whitelist(ctx, *, username):
         json.dump(users, f)
     # Post to staff channel
     channel = client.get_channel(int(settings["request_channel"]))
-    e = discord.Embed(title=cuser, description="New whitelist request, when completed, run the setstatus command.")
+    e = discord.Embed(title=cuser, description="New whitelist request, when completed, run the setstatus command.",
+                      colour=hc)
     e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(uuid))
     e.add_field(name="Discord User", value=ctx.author.mention)
     e.add_field(name="Type", value="Whitelist")
@@ -202,8 +204,7 @@ async def unwhitelist(ctx):
             json.dump(users, f)
         # Post to staff channel
         channel = client.get_channel(int(settings["request_channel"]))
-        e = discord.Embed(title=get_username(uuid),
-                          description="Unwhitelist request")
+        e = discord.Embed(title=get_username(uuid),  description="Unwhitelist request", colour=hc)
         e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(uuid))
         e.add_field(name="Discord User", value=ctx.author.mention)
         e.add_field(name="Type", value="Unwhitelist")
@@ -281,7 +282,8 @@ async def adminadd(ctx, user: discord.Member, *, username):
         json.dump(users, f)
     # Post to staff channel
     channel = client.get_channel(int(settings["request_channel"]))
-    e = discord.Embed(title=cuser, description="New whitelist request, when completed, run the setstatus command.")
+    e = discord.Embed(title=cuser, description="New whitelist request, when completed, run the setstatus command.",
+                      colour=hc)
     e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(uuid))
     e.add_field(name="Discord User", value=user.mention)
     e.add_field(name="Type", value="Whitelist")
@@ -335,7 +337,7 @@ async def playerinfo(ctx, player: Union[discord.Member, str]):
             await ctx.send("It seems like the Mojang API is currently broken, try again later?")
         return
     e = discord.Embed(title=username, description="**Username History:**\n" +
-                                                  "\n".join(["- " + i["name"] for i in reversed(history)]))
+                                                  "\n".join(["- " + i["name"] for i in reversed(history)]), colour=hc)
     e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(uuid))
     e.set_image(url="https://crafatar.com/renders/body/{}?overlay".format(uuid))
     e.set_footer(text="Thanks to Crafatar for providing the skin renders.")
