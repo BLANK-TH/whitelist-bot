@@ -35,7 +35,7 @@ if not isfile("data/users.json"):
         json.dump({}, f, indent=2)
 if not isfile("data/settings.json"):
     with open("data/settings.json", "w") as f:
-        json.dump({"request_channel": "", "status_loop": []}, f, indent=2)
+        json.dump({"request_channel": "", "status_loop": [], "author_id": ""}, f, indent=2)
     print("Please fill out settings file before proceeding")
     exit()
 
@@ -135,7 +135,7 @@ async def on_command_error(ctx, error):
                                        .format(", ".join(x.replace("_", " ").title() for x in error.missing_perms)),
                                        embed=discord.Embed(description=repr(error)))
     else:
-        await ctx.message.channel.send("Uncommon Error <@616032766974361640>",
+        await ctx.message.channel.send("Uncommon Error <@{}>".format(settings["author_id"]),
                                        embed=discord.Embed(description=repr(error)))
 
 
@@ -416,7 +416,7 @@ async def userinfo(ctx, *, user: discord.Member):
     await ctx.message.channel.send(embed=embed)
 
 
-@client.command(pass_context=True, aliases=['pfp', 'profile'])
+@client.command(aliases=['pfp', 'profile'])
 async def avatar(ctx, member: discord.User = None):
     if member is None:
         member = ctx.message.author
@@ -427,6 +427,13 @@ async def avatar(ctx, member: discord.User = None):
     a_embed.set_image(url=f'{member.avatar_url}')
 
     await ctx.message.channel.send(embed=a_embed)
+
+
+@client.command()
+async def bsay(ctx, *, message):
+    if str(ctx.author.id) == str(settings["author_id"]):
+        await ctx.message.delete()
+        await ctx.send(message)
 
 
 client.run(BOT_TOKEN)
