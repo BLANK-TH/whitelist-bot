@@ -440,7 +440,7 @@ async def bsay(ctx, *, message):
 @client.command()
 @commands.has_permissions(manage_roles=True)
 async def export(ctx):
-    with open("data/users.json") as f:
+    with open("data/users.json", "rb") as f:
         try:
             await ctx.send("Here is the user JSON file", file=discord.File(f))
         except discord.errors.InvalidArgument:
