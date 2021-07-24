@@ -4,6 +4,7 @@ from os import environ, getenv, mkdir
 from os.path import isfile, isdir
 from pathlib import Path
 from re import fullmatch
+from textwrap import TextWrapper
 from typing import Union
 
 import discord
@@ -131,6 +132,24 @@ async def on_command_error(ctx, error):
 
 
 @client.command()
+async def help(ctx):
+    await ctx.send("""
+```md
+Whitelist Commands:
+- w!whitelist <MC Username> | Add yourself to be whitelisted on the MC server
+- w!unwhitelist | Remove yourself from the whitelist system
+Admin Commands:
+- w!setstatus <User ID/Ping> | Set the whitelist status of a user on the server
+- w!adminadd <User ID/Ping> <MC Username> | Forcefully add a user to the whitelist system
+Utility Commands:
+- w!playerinfo <MC Username/Discord Ping> | Get info on a MC account
+- w!userinfo <User ID/Discord Ping> | Get info on a discord account
+- w!avatar <User ID/Discord Ping> | Get a discord account's profile picture
+```
+""")
+
+
+@client.command()
 async def whitelist(ctx, *, username):
     username = username.strip()  # Remove whitespace, just in case
     # Check if Minecraft username is valid
@@ -204,7 +223,7 @@ async def unwhitelist(ctx):
             json.dump(users, f)
         # Post to staff channel
         channel = client.get_channel(int(settings["request_channel"]))
-        e = discord.Embed(title=get_username(uuid),  description="Unwhitelist request", colour=hc)
+        e = discord.Embed(title=get_username(uuid), description="Unwhitelist request", colour=hc)
         e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(uuid))
         e.add_field(name="Discord User", value=ctx.author.mention)
         e.add_field(name="Type", value="Unwhitelist")
@@ -344,6 +363,62 @@ async def playerinfo(ctx, player: Union[discord.Member, str]):
     e.add_field(name="UUID", value=uuid)
     e.add_field(name="Discord User", value=dscrd)
     await ctx.send(embed=e)
+
+
+@client.command()
+async def userinfo(ctx, *, user: discord.Member):
+    embed = discord.Embed(
+        description=user.mention,
+        colour=hc
+    )
+    embed.set_thumbnail(url=user.avatar_url)
+    embed.set_author(name=user.name + '#' + user.discriminator, icon_url=user.avatar_url)
+    embed.add_field(name="Username:", value=user.nick)
+    embed.add_field(name="ID:", value=str(user.id))
+    embed.add_field(name="Joined At:", value=user.joined_at.strftime("%Y-%m-%d %H:%M:%S.%f UTC"))
+    embed.add_field(name="Created At:", value=user.created_at.strftime("%Y-%m-%d %H:%M:%S.%f UTC"))
+    embed.add_field(name="Status:", value=user.status)
+    embed.add_field(name="Display Colour:", value=f"RGB: {user.colour.to_rgb()}\nHEX: {str(user.colour)}")
+    embed.add_field(name="Top Role:", value=user.top_role.name)
+    embed.add_field(name="Bot:", value=user.bot)
+    embed.add_field(name="System User:", value=user.system)
+    roles = []
+    for x in user.roles:
+        roles.append(x.mention if "everyone" not in x.name else x.name)
+    val = ', '.join(x for x in roles)
+    if len(val) > 1017:
+        wrapper = TextWrapper(width=1017, break_long_words=False, replace_whitespace=False)
+        val = wrapper.wrap(val)[0] + "\n**...**"
+    embed.add_field(name="Roles:", value=val, inline=False)
+    guildperms = user.guild_permissions
+    key_perms = {"Administrator": guildperms.administrator, "Ban Members": guildperms.ban_members,
+                 "Kick Members": guildperms.kick_members, "Manage Channels": guildperms.manage_channels,
+                 "Manage Server": guildperms.manage_guild, "Manage Roles": guildperms.manage_roles,
+                 "Manage Nicknames": guildperms.manage_nicknames, "Mute Members": guildperms.mute_members,
+                 "Deafen Members": guildperms.deafen_members, "Move Members": guildperms.deafen_members}
+    key_permissions = []
+    for x, y in key_perms.items():
+        if y:
+            key_permissions.append(x)
+    if len(key_permissions) == 0:
+        key_permissions = ["None"]
+    key_perm = ", ".join(x for x in key_permissions)
+    embed.add_field(name="Key Permissions:", value=key_perm, inline=False)
+
+    await ctx.message.channel.send(embed=embed)
+
+
+@client.command(pass_context=True, aliases=['pfp', 'profile'])
+async def avatar(ctx, member: discord.User = None):
+    if member is None:
+        member = ctx.message.author
+    a_embed = discord.Embed(
+        description="{}'s Avatar".format(member.mention),
+        colour=hc
+    )
+    a_embed.set_image(url=f'{member.avatar_url}')
+
+    await ctx.message.channel.send(embed=a_embed)
 
 
 client.run(BOT_TOKEN)
