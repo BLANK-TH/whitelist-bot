@@ -441,7 +441,7 @@ async def bsay(ctx, *, message):
 async def export(ctx):
     with open("data/users.json") as f:
         try:
-            await ctx.send("Here is the user JSON file", file=f)
+            await ctx.send("Here is the user JSON file", file=discord.File(f))
         except discord.errors.InvalidArgument:
             await ctx.send("File is too large too send, ask the hoster for the file instead.")
 
