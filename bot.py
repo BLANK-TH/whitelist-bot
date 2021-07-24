@@ -149,6 +149,7 @@ Whitelist Commands:
 Admin Commands:
 - w!setstatus <User ID/Ping> | Set the whitelist status of a user on the server
 - w!adminadd <User ID/Ping> <MC Username> | Forcefully add a user to the whitelist system
+- w!export | Export the user JSON file for backups or some other reason
 Utility Commands:
 - w!playerinfo <MC Username/Discord Ping> | Get info on a MC account
 - w!userinfo <User ID/Discord Ping> | Get info on a discord account
