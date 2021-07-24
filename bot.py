@@ -2,6 +2,7 @@ import json
 from difflib import SequenceMatcher
 from os import environ, getenv, mkdir
 from os.path import isfile, isdir
+from itertools import cycle
 from pathlib import Path
 from re import fullmatch
 from textwrap import TextWrapper
@@ -9,7 +10,7 @@ from typing import Union
 
 import discord
 import requests
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 # Initialize variables
@@ -34,7 +35,7 @@ if not isfile("data/users.json"):
         json.dump({}, f, indent=2)
 if not isfile("data/settings.json"):
     with open("data/settings.json", "w") as f:
-        json.dump({"request_channel": ""}, f, indent=2)
+        json.dump({"request_channel": "", "status_loop": []}, f, indent=2)
     print("Please fill out settings file before proceeding")
     exit()
 
@@ -45,6 +46,7 @@ with open("data/settings.json") as f:
         if len(i) < 1:
             print("Please fill out the settings")
             exit()
+status = cycle(["Developed by blank_dvth"] + settings["status_loop"])
 
 
 def get_username(uuid):
@@ -62,7 +64,13 @@ def get_username(uuid):
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.online)
+    change_status.start()
     print("Bot Started")
+
+
+@tasks.loop(seconds=10)
+async def change_status():
+    await client.change_presence(activity=discord.Game(next(status)))
 
 
 @client.event
