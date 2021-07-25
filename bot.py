@@ -14,7 +14,9 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 # Initialize variables
-client = commands.Bot(command_prefix="w!", guild_subscriptions=True)
+intents = discord.Intents.default()
+intents.members = True
+client = commands.Bot(command_prefix="w!", guild_subscriptions=True, intents=intents)
 hc = 0x00c9ff
 client.remove_command('help')
 
