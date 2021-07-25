@@ -94,7 +94,7 @@ async def on_member_remove(member):
             # Post to staff channel
             channel = client.get_channel(int(settings["request_channel"]))
             e = discord.Embed(title=get_username(usr["uuid"]),
-                              description="Unwhitelist request",
+                              description="User left, automatically removed from system",
                               colour=hc)
             e.set_thumbnail(url="https://crafatar.com/avatars/{}?overlay".format(usr["uuid"]))
             e.add_field(name="Discord User", value=member.mention)
